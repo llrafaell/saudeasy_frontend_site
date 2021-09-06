@@ -1,26 +1,35 @@
 import React, { useState, useEffect } from "react";
-import { Switch, Route, Link } from "react-router-dom";
+import {useSelector} from 'react-redux';
+
+import { BrowserRouter as Router, Switch, Route, Link } from "react-router-dom";
 import "./App.css";
 
-import AuthService from "./services/auth.service";
 
-import Login from "./components/Login";
-import Register from "./components/Register";
-import Home from "./components/Home";
-import Profile from "./components/Profile";
+import PrivateRoute from "./routes/privateRoute";
+import AuthService from "./services/auth.service";
+import theme from './themes';
+
+import Login from "./main/auth/Login";
+import Register from "./main/auth/Register";
+import Home from "./main/home/Home";
+import Profile from "./main/profile/Profile";
+
 
 const App = () => {
-  const [showModeratorBoard, setShowModeratorBoard] = useState(false);
-  const [showAdminBoard, setShowAdminBoard] = useState(false);
   const [currentUser, setCurrentUser] = useState(undefined);
+  const customization = useSelector((state) => state.customization);
+
+
+  if (customization.rtlLayout) {
+    document.querySelector('body').setAttribute('dir', 'rtl');
+  }
 
   useEffect(() => {
     const user = AuthService.getCurrentUser();
-
     if (user) {
       setCurrentUser(user);
     }
-  }, []);
+  },[]);
 
   const logOut = () => {
     AuthService.logout();
@@ -72,13 +81,14 @@ const App = () => {
       </nav>
 
       <div className="container mt-3">
-        <Switch>
-          <Route exact path={["/", "/home"]} component={Home} />
-          <Route exact path="/login" component={Login} />
-          <Route exact path="/register" component={Register} />
-          <Route exact path="/profile" component={Profile} />
-
-        </Switch>
+        <Router>
+          <Switch>
+            <Route exact path="/login" component={Login} />
+            <Route exact path="/register" component={Register} />
+            <PrivateRoute exact path={["/", "/home"]} component={Home} exact />
+            <PrivateRoute exact path="/profile" component={Profile} />
+          </Switch>
+        </Router>
       </div>
     </div>
   );

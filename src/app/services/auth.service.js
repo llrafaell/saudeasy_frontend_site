@@ -12,7 +12,6 @@ const register = (username, email, password) => {
 };
 
 const login = (email, password) => {
- 
 
   return axios
     .post(API_URL + "auth/signin", {}, 
@@ -41,9 +40,17 @@ const getCurrentUser = () => {
   return JSON.parse(localStorage.getItem("user"));
 };
 
+const isLogin = () => {
+  if (localStorage.getItem("user")) {
+      return true;
+  }
+  return false;
+}
+
 export default {
   register,
   login,
   logout,
   getCurrentUser,
+  isLogin,
 };
